@@ -1,38 +1,50 @@
+﻿/* ============================================================
+   TPI - Base de Datos II (TUP) - Equipo 10
+   Funciones de usuario de VeterinariaPatitas
+   Ejecutar después de Creacion.sql y Datos.sql
+   ============================================================ */
+
 USE VeterinariaPatitas;
 GO
 
-IF OBJECT_ID('dbo.FN_EdadMascota', 'FN') IS NOT NULL
-    DROP FUNCTION dbo.FN_EdadMascota;
-
-GO
-
--- Funcion para 
-CREATE FUNCTION dbo.FN_EdadMascota (
-    @fechaNacimiento DATE
+-- FN_EdadMascota: devuelve la edad en años de una mascota a una fecha de referencia.
+-- Si todavía no cumplió años en el año de referencia, se resta uno.
+CREATE OR ALTER FUNCTION dbo.FN_EdadMascota (
+    @FechaNacimiento DATE,
+    @FechaReferencia DATE
 )
 RETURNS INT
 AS
 BEGIN
-    DECLARE @Edad INT;
-    DECLARE @FechaActual DATE = CAST(GETDATE() AS DATE);
+    DECLARE @edad INT;
 
-    SET @Edad = DATEDIFF(YEAR,@fechaNacimiento,@FechaActual);
+    SET @edad = DATEDIFF(YEAR, @FechaNacimiento, @FechaReferencia);
 
-    IF (MONTH(@FechaActual) = MONTH(@fechaNacimiento) AND DAY(@FechaActual) < DAY(@fechaNacimiento))
+    IF (MONTH(@FechaReferencia) < MONTH(@FechaNacimiento))
+       OR (MONTH(@FechaReferencia) = MONTH(@FechaNacimiento)
+           AND DAY(@FechaReferencia) < DAY(@FechaNacimiento))
     BEGIN
-        SET @Edad = @Edad - 1;
+        SET @edad = @edad - 1;
     END;
 
-    RETURN @Edad;
+    RETURN @edad;
 END;
 GO
 
--- Verificacion de funcionamiento correcto, borrar dsp
--- SELECT
---     M.IDMascota,
---     M.Nombre AS NombreMascota,
---     E.Nombre AS Especie,
---     M.FechaNacimiento,
---     dbo.FN_EdadMascota(M.FechaNacimiento) AS EdadActual 
--- FROM Mascotas M 
--- INNER JOIN Especies E ON M.IDEspecie = E.IDEspecie;
+-- FN_ImporteMedicamentos: devuelve cuánto se cobró en medicamentos en una consulta
+-- (cantidad por el precio que tenía cada medicamento ese día). Si no usó ninguno, devuelve 0.
+CREATE OR ALTER FUNCTION dbo.FN_ImporteMedicamentos (
+    @IDConsulta INT
+)
+RETURNS DECIMAL(10,2)
+AS
+BEGIN
+    DECLARE @total DECIMAL(10,2);
+
+    SELECT @total = SUM(Cantidad * PrecioUnitario)
+    FROM ConsultaMedicamentos
+    WHERE IDConsulta = @IDConsulta;
+
+    RETURN ISNULL(@total, 0);
+END;
+GO
