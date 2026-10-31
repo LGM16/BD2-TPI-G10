@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    TPI - Base de Datos II (TUP) - Equipo 10
    Sistema: gestión de una veterinaria
    Motor: SQL Server
