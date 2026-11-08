@@ -1,15 +1,15 @@
-/* ============================================================
+﻿/* ============================================================
    TPI - Base de Datos II (TUP) - Equipo 10
    Triggers de la veterinaria (VeterinariaPatitas)
 
    Cómo usarlo:
-   Ejecutar una sola vez, después de Creacion.sql y Datos.sql. 
+   Ejecutar después de Creacion.sql y Datos.sql.
    ============================================================ */
 
 USE VeterinariaPatitas;
 GO
 
-CREATE TRIGGER TR_ValidarTurno ON Turnos
+CREATE OR ALTER TRIGGER TR_ValidarTurno ON Turnos
 AFTER INSERT
 AS
 BEGIN
@@ -76,7 +76,7 @@ GO
 
 -- Descuenta del stock los medicamentos usados en una consulta.
 -- Si no alcanza, cancela la operación y avisa el error.
-CREATE TRIGGER TR_DescontarStockMedicamento ON ConsultaMedicamentos
+CREATE OR ALTER TRIGGER TR_DescontarStockMedicamento ON ConsultaMedicamentos
 AFTER INSERT
 AS
 BEGIN
@@ -98,7 +98,7 @@ END
 GO
 
 -- Al anular una consulta se devuelve el stock usado, se borra el detalle y se deja como pendiente el turno.
-CREATE TRIGGER TR_AnularConsulta ON Consultas
+CREATE OR ALTER TRIGGER TR_AnularConsulta ON Consultas
 INSTEAD OF DELETE
 AS
 BEGIN
